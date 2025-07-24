@@ -1,30 +1,37 @@
-name: Deploy to IIS
-
-on:
-  push:
-    branches:
-      - main
-
 jobs:
-  build-and-deploy:
-    runs-on: self-hosted
-    steps:
-      - uses: actions/checkout@v3
+  build:
+    runs-on: [self-hosted, windows]
 
-      - name: Restore Dependencies
-        run: dotnet restore
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x' # or your actual version
+
+      - name: Restore dependencies
+        run: dotnet restore WebCalculator/WebCalculator.csproj
 
       - name: Build
-        run: dotnet build --no-restore
+        run: dotnet build WebCalculator/WebCalculator.csproj --configuration Release
 
       - name: Test
-        run: dotnet test --no-build
+        run: dotnet test
+
+      - name: Publish
+        run: dotnet publish WebCalculator/WebCalculator.csproj -c Release -o publish
 
       - name: Stop IIS Site
-        run: iisreset /stop
+        run: Stop-WebAppPool -Name "DefaultAppPool"
+        shell: powershell
 
       - name: Deploy to IIS
-        run: Copy-Item ./publish/* C:/inetpub/wwwroot/your-app -Recurse -Force
+        run: Copy-Item ./publish/* -Destination "C:/inetpub/wwwroot/your-app" -Recurse -Force
+        shell: powershell
 
       - name: Start IIS Site
-        run: iisreset /start
+        run: Start-WebAppPool -Name "DefaultAppPool"
+        shell: powershell
+
