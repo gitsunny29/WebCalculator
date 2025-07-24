@@ -1,9 +1,9 @@
-name: Deploy Static Calculator to IIS
+name: Deploy Calculator Without Admin
 
 on:
   push:
     branches:
-      - main  # Or your desired branch
+      - main
 
 jobs:
   deploy:
@@ -13,25 +13,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Stop IIS Site
+      - name: Clear old files
         run: |
-          Import-Module WebAdministration
-          Stop-WebAppPool -Name "DefaultAppPool"
+          Remove-Item "$env:USERPROFILE\Sites\calculator\*" -Recurse -Force -ErrorAction SilentlyContinue
         shell: powershell
 
-      - name: Clear existing files (optional)
+      - name: Deploy to user-accessible folder
         run: |
-          Remove-Item "C:\inetpub\wwwroot\your-app\*" -Recurse -Force -ErrorAction SilentlyContinue
+          New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\Sites\calculator"
+          Copy-Item -Path "./calculator/*" -Destination "$env:USERPROFILE\Sites\calculator" -Recurse -Force
         shell: powershell
 
-      - name: Deploy static HTML app to IIS
+      - name: List deployed files (verify)
         run: |
-          New-Item -ItemType Directory -Force -Path "C:\inetpub\wwwroot\your-app"
-          Copy-Item -Path "./calculator/*" -Destination "C:\inetpub\wwwroot\your-app" -Recurse -Force
+          Get-ChildItem "$env:USERPROFILE\Sites\calculator"
         shell: powershell
 
-      - name: Start IIS Site
-        run: |
-          Start-WebAppPool -Name "DefaultAppPool"
-        shell: powershell
 
