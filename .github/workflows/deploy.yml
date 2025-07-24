@@ -1,37 +1,37 @@
+name: Deploy Static Calculator to IIS
+
+on:
+  push:
+    branches:
+      - main  # Or your desired branch
+
 jobs:
-  build:
+  deploy:
     runs-on: [self-hosted, windows]
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '8.0.x' # or your actual version
-
-      - name: Restore dependencies
-        run: dotnet restore WebCalculator/WebCalculator.csproj
-
-      - name: Build
-        run: dotnet build WebCalculator/WebCalculator.csproj --configuration Release
-
-      - name: Test
-        run: dotnet test
-
-      - name: Publish
-        run: dotnet publish WebCalculator/WebCalculator.csproj -c Release -o publish
-
       - name: Stop IIS Site
-        run: Stop-WebAppPool -Name "DefaultAppPool"
+        run: |
+          Import-Module WebAdministration
+          Stop-WebAppPool -Name "DefaultAppPool"
         shell: powershell
 
-      - name: Deploy to IIS
-        run: Copy-Item ./publish/* -Destination "C:/inetpub/wwwroot/your-app" -Recurse -Force
+      - name: Clear existing files (optional)
+        run: |
+          Remove-Item "C:\inetpub\wwwroot\your-app\*" -Recurse -Force -ErrorAction SilentlyContinue
+        shell: powershell
+
+      - name: Deploy static HTML app to IIS
+        run: |
+          New-Item -ItemType Directory -Force -Path "C:\inetpub\wwwroot\your-app"
+          Copy-Item -Path "./calculator/*" -Destination "C:\inetpub\wwwroot\your-app" -Recurse -Force
         shell: powershell
 
       - name: Start IIS Site
-        run: Start-WebAppPool -Name "DefaultAppPool"
+        run: |
+          Start-WebAppPool -Name "DefaultAppPool"
         shell: powershell
 
