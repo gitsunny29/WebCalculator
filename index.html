@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Calculator</title>
+</head>
+<body>
+  <h1>Simple Calculator</h1>
+  <input id="num1" type="number" placeholder="First number" />
+  <input id="num2" type="number" placeholder="Second number" />
+  <br><br>
+  <button onclick="calculate('+')">+</button>
+  <button onclick="calculate('-')">-</button>
+  <button onclick="calculate('*')">*</button>
+  <button onclick="calculate('/')">/</button>
+  <br><br>
+  <h3>Result: <span id="result"></span></h3>
+
+  <script>
+    function calculate(op) {
+      var a = parseFloat(document.getElementById("num1").value);
+      var b = parseFloat(document.getElementById("num2").value);
+      var result;
+      switch (op) {
+        case '+': result = a + b; break;
+        case '-': result = a - b; break;
+        case '*': result = a * b; break;
+        case '/': result = b !== 0 ? a / b : 'Error: Divide by zero'; break;
+      }
+      document.getElementById("result").innerText = result;
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+C:\Users\User\Desktop\Calculatorapp\bin\Debug\net9.0\Calculatorapp.exe
+C:\Users\User\Desktop\Calculatorapp\bin\Debug\net9.0\Calculatorapp.deps.json
+C:\Users\User\Desktop\Calculatorapp\bin\Debug\net9.0\Calculatorapp.runtimeconfig.json
+C:\Users\User\Desktop\Calculatorapp\bin\Debug\net9.0\Calculatorapp.dll
+C:\Users\User\Desktop\Calculatorapp\bin\Debug\net9.0\Calculatorapp.pdb
+C:\Users\User\Desktop\Calculatorapp\obj\Debug\net9.0\Calculatorapp.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\User\Desktop\Calculatorapp\obj\Debug\net9.0\Calculatorapp.AssemblyInfoInputs.cache
+C:\Users\User\Desktop\Calculatorapp\obj\Debug\net9.0\Calculatorapp.AssemblyInfo.cs
+C:\Users\User\Desktop\Calculatorapp\obj\Debug\net9.0\Calculatorapp.csproj.CoreCompileInputs.cache
+C:\Users\User\Desktop\Calculatorapp\obj\Debug\net9.0\Calculatorapp.dll
+C:\Users\User\Desktop\Calculatorapp\obj\Debug\net9.0\refint\Calculatorapp.dll
+C:\Users\User\Desktop\Calculatorapp\obj\Debug\net9.0\Calculatorapp.pdb
+C:\Users\User\Desktop\Calculatorapp\obj\Debug\net9.0\Calculatorapp.genruntimeconfig.cache
+C:\Users\User\Desktop\Calculatorapp\obj\Debug\net9.0\ref\Calculatorapp.dll
