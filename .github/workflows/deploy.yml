@@ -1,0 +1,30 @@
+name: Deploy to IIS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Restore Dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore
+
+      - name: Test
+        run: dotnet test --no-build
+
+      - name: Stop IIS Site
+        run: iisreset /stop
+
+      - name: Deploy to IIS
+        run: Copy-Item ./publish/* C:/inetpub/wwwroot/your-app -Recurse -Force
+
+      - name: Start IIS Site
+        run: iisreset /start
