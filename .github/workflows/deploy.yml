@@ -1,0 +1,109 @@
+trigger:
+  branches:
+    include:
+      - main
+
+pool:
+  name: IIS-deployment-pool      # your self‑hosted Windows agent pool
+  demands:
+    - iis
+    - visualstudio
+
+variables:
+  buildConfiguration: 'Release'
+  solution: '**/*.sln'
+  appName: 'WebCalculator'
+  siteName: 'Default Web Site'
+  physicalPath: 'C:\\inetpub\\wwwroot\\$(appName)'
+  backupPath: 'C:\\inetpub\\wwwroot\\Backups'
+
+stages:
+- stage: Build
+  displayName: Build and Publish
+  jobs:
+  - job: Build
+    displayName: Build project
+    steps:
+    - checkout: self
+    - task: NuGetToolInstaller@1
+    - task: NuGetCommand@2
+      inputs:
+        restoreSolution: '$(solution)'
+    - task: VSBuild@1
+      inputs:
+        solution: '$(solution)'
+        configuration: '$(buildConfiguration)'
+        msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:DesktopBuildPackageLocation="$(Build.ArtifactStagingDirectory)\\WebApp.zip" /p:DeployIisAppPath="$(siteName)"'
+    - task: VSTest@2
+      inputs:
+        platform: 'Any CPU'
+        configuration: '$(buildConfiguration)'
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
+
+- stage: Deploy
+  displayName: Deploy to IIS
+  dependsOn: Build
+  jobs:
+  - deployment: DeployJob
+    displayName: Deploy to IIS Host
+    environment: 'IIS-Deployment'  # define your Azure DevOps environment linked to your VM
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: drop
+          - powershell: |
+              # Backup current deployment
+              if (!(Test-Path "$(backupPath)")) { New-Item -Path "$(backupPath)" -ItemType Directory }
+              $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
+              $dest = Join-Path "$(backupPath)" "$(appName)_$timestamp"
+              if (Test-Path "$(physicalPath)") {
+                Copy-Item "$(physicalPath)" $dest -Recurse -Force
+              }
+            displayName: Backup existing site
+          - task: IISWebAppManagementOnMachineGroup@0
+            displayName: Stop Website
+            inputs:
+              IISDeploymentType: IISWebsite
+              ActionIISWebsite: StopWebsite
+              StartStopWebsiteName: $(siteName)
+          - task: IISWebAppManagementOnMachineGroup@0
+            displayName: Stop Application Pool
+            inputs:
+              IISDeploymentType: IISApplicationPool
+              ActionIISApplicationPool: StopAppPool
+              StartStopRecycleAppPoolName: $(appName)
+          - task: IISWebAppManagementOnMachineGroup@0
+            displayName: Create App & Pool if needed
+            inputs:
+              IISDeploymentType: IISWebApplication
+              ParentWebsiteNameForApplication: $(siteName)
+              VirtualPathForApplication: '/$(appName)'
+              PhysicalPathForApplication: $(physicalPath)
+              AppPoolNameForApplication: $(appName)
+              DotNetVersionForApplication: 'No Managed Code'
+              CreateOrUpdateAppPoolForApplication: true
+          - task: IISWebAppDeploymentOnMachineGroup@0
+            displayName: Deploy Package
+            inputs:
+              WebSiteName: $(siteName)
+              VirtualApplication: $(appName)
+              Package: '$(Pipeline.Workspace)\\drop\\WebApp.zip'
+          - task: IISWebAppManagementOnMachineGroup@0
+            displayName: Start Application Pool
+            inputs:
+              IISDeploymentType: IISApplicationPool
+              ActionIISApplicationPool: StartAppPool
+              StartStopRecycleAppPoolName: $(appName)
+          - task: IISWebAppManagementOnMachineGroup@0
+            displayName: Start Website
+            inputs:
+              IISDeploymentType: IISWebsite
+              ActionIISWebsite: StartWebsite
+              StartStopWebsiteName: $(siteName)
+
