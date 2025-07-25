@@ -14,32 +14,37 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Show current directory
+        shell: powershell
         run: |
           Write-Host "Current directory: $PWD"
-        shell: powershell
+        
 
       - name: Debug: Show all repo files
+        shell: powershell
         run: |
           Get-ChildItem -Recurse | Select-Object FullName
-        shell: powershell
+        
 
       - name: Clear old deployed files
+        shell: powershell
         run: |
           $target = "$env:USERPROFILE\Sites\calculator"
           if (Test-Path $target) {
             Remove-Item "$target\*" -Recurse -Force -ErrorAction SilentlyContinue
           }
-        shell: powershell
+        
 
       - name: Deploy calculator files
+        shell: powershell
         run: |
           $source = "./WebCalculator"  # Adjust this if needed
           $target = "$env:USERPROFILE\Sites\calculator"
           New-Item -ItemType Directory -Force -Path $target
           Copy-Item -Path "$source\*" -Destination $target -Recurse -Force
-        shell: powershell
+        
 
       - name: List deployed files
+        shell: powershell
         run: |
           Get-ChildItem "$env:USERPROFILE\Sites\calculator" -Recurse
-        shell: powershell
+
