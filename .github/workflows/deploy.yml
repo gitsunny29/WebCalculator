@@ -8,7 +8,7 @@ on:
 jobs:
   build:
     name: Build and Package Application
-    runs-on: windows-latest
+    runs-on: self-hosted
 
     env:
       buildConfiguration: 'Release'
@@ -49,12 +49,13 @@ jobs:
 
   deploy:
     name: Deploy to IIS
-    runs-on: windows-latest  # Your self-hosted Windows IIS runner
+    runs-on: self-hosted  # Your self-hosted Windows IIS runner
     needs: build
 
     env:
       appName: 'WebCalculator'
-      siteName: 'Default Web Site'
+      siteName: 'WebCalculator'
+      port: 8081
       physicalPath: 'C:\\inetpub\\wwwroot\\WebCalculator'
       backupPath: 'C:\\inetpub\\wwwroot\\Backups'
       packageZip: 'WebApp.zip'
