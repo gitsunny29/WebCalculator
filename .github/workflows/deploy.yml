@@ -13,7 +13,7 @@ jobs:
     env:
       buildConfiguration: 'Release'
       solution: 'Calculatorapp.sln'
-      projectPath: Calculatorapp/Calculatorapp.csproj
+      projectPath: Calculatorapp.csproj
       outputDir: publish
       outputZip: 'WebApp.zip'
 
