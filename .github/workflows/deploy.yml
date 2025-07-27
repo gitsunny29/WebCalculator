@@ -8,7 +8,7 @@ on:
 jobs:
   build:
     name: Build and Package Application
-    runs-on: self-hosted
+    runs-on: windows-latest
 
     env:
       buildConfiguration: 'Release'
@@ -49,7 +49,7 @@ jobs:
 
   deploy:
     name: Deploy to IIS
-    runs-on: self-hosted  # Your self-hosted Windows IIS runner
+    runs-on: windows-latest  # Your self-hosted Windows IIS runner
     needs: build
 
     env:
