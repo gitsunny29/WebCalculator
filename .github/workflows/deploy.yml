@@ -42,7 +42,7 @@ jobs:
         shell: powershell
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@4
+        uses: actions/upload-artifact@v4
         with:
           name: WebApp
           path: ${{ env.outputZip }}
