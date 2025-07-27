@@ -86,7 +86,7 @@ jobs:
 
       # Stop IIS site
       - name: Stop IIS Website
-        shell: pwsh
+        shell: powershell
         run: |
           Import-Module WebAdministration
           if (Get-Website -Name "${{ env.siteName }}") {
@@ -95,7 +95,7 @@ jobs:
 
       # Stop App Pool
       - name: Stop App Pool
-        shell: pwsh
+        shell: powershell
         run: |
           Import-Module WebAdministration
           if (Test-Path "IIS:\\AppPools\\${{ env.appName }}") {
@@ -104,7 +104,7 @@ jobs:
 
       # Create App Directory if missing
       - name: Ensure Physical Path Exists
-        shell: pwsh
+        shell: powershell
         run: |
           if (!(Test-Path "${{ env.physicalPath }}")) {
             New-Item -ItemType Directory -Path "${{ env.physicalPath }}"
@@ -112,13 +112,13 @@ jobs:
 
       # Unzip WebApp package to deployment folder
       - name: Deploy WebApp to IIS
-        shell: pwsh
+        shell: powershell
         run: |
           Expand-Archive -Path "${{ env.packageZip }}" -DestinationPath "${{ env.physicalPath }}" -Force
 
       # Start App Pool
       - name: Start App Pool
-        shell: pwsh
+        shell: powershell
         run: |
           Import-Module WebAdministration
           if (Test-Path "IIS:\\AppPools\\${{ env.appName }}") {
@@ -127,7 +127,7 @@ jobs:
 
       # Start IIS Website
       - name: Start IIS Website
-        shell: pwsh
+        shell: powershell
         run: |
           Import-Module WebAdministration
           if (Get-Website -Name "${{ env.siteName }}") {
