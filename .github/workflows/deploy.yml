@@ -68,7 +68,7 @@ jobs:
 
       # Backup existing deployed app
       - name: Backup Existing Deployment
-        shell: pwsh
+        shell: powershell
         run: |
           if (!(Test-Path "${{ env.backupPath }}")) {
             New-Item -ItemType Directory -Path "${{ env.backupPath }}"
