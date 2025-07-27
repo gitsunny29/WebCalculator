@@ -13,6 +13,8 @@ jobs:
     env:
       buildConfiguration: 'Release'
       solution: 'Calculatorapp.sln'
+      projectPath: Calculatorapp/Calculatorapp.csproj
+      outputDir: publish
       outputZip: 'WebApp.zip'
 
     steps:
@@ -24,31 +26,23 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.0.303'
-    
-      # Setup NuGet
-      - name: Setup NuGet
-        uses: NuGet/setup-nuget@v1
 
       # Restore NuGet packages
       - name: Restore NuGet packages
         run: dotnet restore ${{ env.solution }}
 
-      # Setup MSBuild
-      - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v1.1
+      - name: Build Application
+        run: dotnet build ${{ env.solution }} --configuration ${{ env.buildConfiguration }} --no-restore
 
-      # Build the solution and create a web deploy package (ZIP)
-      - name: Build and Package
-        run: |
-          msbuild ${{ env.solution }} /p:Configuration=${{ env.buildConfiguration }} `
-            /p:DeployOnBuild=true `
-            /p:WebPublishMethod=Package `
-            /p:PackageAsSingleFile=true `
-            /p:DesktopBuildPackageLocation="${{ env.outputZip }}"
+      - name: Publish Application
+        run: dotnet publish ${{ env.projectPath }} --configuration ${{ env.buildConfiguration }} --output ${{ env.outputDir }}
 
-      # Upload ZIP artifact to share with deploy job
-      - name: Upload Build Artifact
-        uses: actions/upload-artifact@v4
+      - name: Zip Published Output
+        run: Compress-Archive -Path "${{ env.outputDir }}\*" -DestinationPath "${{ env.outputZip }}"
+        shell: powershell
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@4
         with:
           name: WebApp
           path: ${{ env.outputZip }}
