@@ -43,7 +43,7 @@ jobs:
 
       # Upload ZIP artifact to share with deploy job
       - name: Upload Build Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: WebApp
           path: ${{ env.outputZip }}
